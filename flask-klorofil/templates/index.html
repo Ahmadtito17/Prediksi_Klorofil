@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prediksi Klorofil</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #00c9a7, #0077b6, #003049);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      color: #ffffff;
+    }
+
+    .navbar {
+      background: transparent;
+    }
+
+    .navbar-brand, .nav-link {
+      color: #ffffff !important;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: #00e676 !important;
+      text-decoration: underline;
+    }
+
+    .nav-link.active {
+      color: #00e676 !important;
+      font-weight: bold;
+      border-bottom: 2px solid #00e676;
+    }
+
+    .sidebar {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 12px;
+      height: 100%;
+    }
+
+    .btn-outline-success {
+      border-color: #00e676;
+      color: #00e676;
+    }
+
+    .btn-outline-success:hover {
+      background-color: #00e676;
+      color: #00332f;
+    }
+
+    .btn-outline-primary {
+      border-color: #40c4ff;
+      color: #40c4ff;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: #40c4ff;
+      color: #00332f;
+    }
+
+    .btn-success {
+      background-color: #00e676;
+      border-color: #00e676;
+      color: #00332f;
+      font-weight: bold;
+    }
+
+    .btn-success:hover {
+      background-color: #00c853;
+      border-color: #00c853;
+    }
+
+    .badge-method {
+      background-color: #00e676;
+      color: #00332f;
+      font-size: 12px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      color: #ffffff;
+    }
+
+    table {
+      color: #ffffff;
+    }
+
+    .table thead th {
+      background-color: rgba(0, 0, 0, 0.2);
+      color: #000000;
+    }
+
+    .table tbody td {
+      color: #000000;
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .h5 {
+      color: #000000; 
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="/">🌿 Prediksi Klorofil</a>
+    <div class="ms-auto">
+      <a class="nav-link d-inline me-3 {% if page == 'dashboard' %}active{% endif %}" href="/">Dashboard</a>
+      <a class="nav-link d-inline me-3 {% if page == 'prediksi' %}active{% endif %}" href="/prediksi">Analisis</a>
+      <a class="nav-link d-inline {% if page == 'history' %}active{% endif %}" href="/history">Riwayat</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="row">
+    <!-- Sidebar kiri -->
+    <div class="col-md-3 sidebar mb-4">
+      <h5 class="text-white mb-3">Pilih Metode:</h5>
+      <form action="/prediksi" method="get" class="d-grid gap-2">
+        <input type="hidden" name="method" value="knn">
+        <button type="submit" class="btn btn-outline-success {% if method == 'knn' %}active-method{% endif %}">🔍 KNN</button>
+      </form>
+      <form action="/prediksi" method="get" class="d-grid gap-2 mt-2">
+        <input type="hidden" name="method" value="regresi">
+        <button type="submit" class="btn btn-outline-primary {% if method == 'regresi' %}active-method{% endif %}">📈 Regresi</button>
+      </form>
+      <div class="mt-3">
+        <span class="badge badge-method">Metode: {{ method|upper }}</span>
+      </div>
+    </div>
+
+    <!-- Konten kanan -->
+    <div class="col-md-9">
+      <!-- Upload file -->
+      <div class="card p-4">
+        <h4 class="mb-3">Upload File</h4>
+        <form action="/prediksi" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="method" value="{{ method }}">
+          <div class="mb-3">
+            <input class="form-control" name="file" type="file" accept=".xlsx,.xls" required>
+          </div>
+          <button type="submit" class="btn btn-success">Analisis Sekarang</button>
+        </form>
+      </div>
+
+      {% if results %}
+      <!-- Tabel Hasil -->
+      <div class="card p-4 mt-4">
+        <h5 class="text-success">Hasil Prediksi</h5>
+        <p>File: <strong>{{ filename }}</strong></p>
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm mt-3">
+            <thead>
+              <tr>
+                <th>#</th>
+                {% for key in results[0].keys() %}
+                  <th>{{ key }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in results %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                {% for key in row.keys() %}
+                  <td>{{ "%.4f"|format(row[key]) if row[key] is number else row[key] }}</td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Visualisasi -->
+      <div class="card p-4 mt-4 text-center">
+        <h5 class="text-success">Excess Green vs Prediksi Klorofil A</h5>
+        <img src="{{ url_for('static', filename='plot_a.png') }}" class="img-fluid rounded mt-3">
+      </div>
+
+      <div class="card p-4 mt-4 text-center">
+        <h5 class="text-success">Excess Green vs Prediksi Klorofil B</h5>
+        <img src="{{ url_for('static', filename='plot_b.png') }}" class="img-fluid rounded mt-3">
+      </div>
+
+      <div class="card p-4 mt-4 text-center">
+        <h5 class="text-success">Excess Green vs Prediksi Total Klorofil</h5>
+        <img src="{{ url_for('static', filename='plot_total.png') }}" class="img-fluid rounded mt-3">
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
