@@ -19,33 +19,40 @@
       padding: 20px;
     }
     table { background: #ffffff; color: #00332f; }
+    .navbar { background: transparent; }
+    .navbar-brand, .nav-link { color: #ffffff !important; }
+    .nav-link.active {
+      color: #aaff00 !important;
+      font-weight: bold;
+      border-bottom: 2px solid #aaff00;
+    }
   </style>
 </head>
 <body>
 <div class="container mt-4">
   <h3>📑 Detail Riwayat Prediksi</h3>
   <div class="card mb-4">
-    <p><strong>Nama File:</strong> {{ entry.filename }}</p>
-    <p><strong>Metode:</strong> {{ entry.method|upper }}</p>
-    <p><strong>Waktu:</strong> {{ entry.timestamp }}</p>
+    <p><strong>Nama File:</strong> {{ history.filename }}</p>
+    <p><strong>Metode:</strong> {{ history.method|upper }}</p>
+    <p><strong>Waktu:</strong> {{ history.timestamp }}</p>
 
     <div class="table-responsive">
       <table class="table table-bordered table-sm">
         <thead class="table-light">
           <tr>
             <th>#</th>
-            {% if entry.results[0].get('Perlakuan') %}<th>Perlakuan</th>{% endif %}
-            {% if entry.results[0].get('Pengambilan') %}<th>Pengambilan</th>{% endif %}
+            {% if history.results[0].get('Perlakuan') %}<th>Perlakuan</th>{% endif %}
+            {% if history.results[0].get('Pengambilan') %}<th>Pengambilan</th>{% endif %}
             <th>R</th><th>G</th><th>B</th><th>Excess Green</th>
             <th>Prediksi A</th><th>Prediksi B</th><th>Prediksi Total</th>
           </tr>
         </thead>
         <tbody>
-          {% for row in entry.results %}
+          {% for row in history.results %}
             <tr>
               <td>{{ loop.index }}</td>
-              {% if row.get('Perlakuan') %}<td>{{ row['Perlakuan'] }}</td>{% endif %}
-              {% if row.get('Pengambilan') %}<td>{{ row['Pengambilan'] }}</td>{% endif %}
+              {% if row.get('Perlakuan') is not none %}<td>{{ row['Perlakuan'] }}</td>{% endif %}
+              {% if row.get('Pengambilan') is not none %}<td>{{ row['Pengambilan'] }}</td>{% endif %}
               <td>{{ "%.2f"|format(row['R']) }}</td>
               <td>{{ "%.2f"|format(row['G']) }}</td>
               <td>{{ "%.2f"|format(row['B']) }}</td>
@@ -58,7 +65,10 @@
         </tbody>
       </table>
     </div>
-    <a href="/history" class="btn btn-secondary mt-3">🔙 Kembali ke Riwayat</a>
+    <div class="d-flex gap-2 mt-3">
+      <a href="/history" class="btn btn-secondary">🔙 Kembali ke Riwayat</a>
+      <a href="/prediksi" class="btn btn-primary">📊 Analisis Baru</a>
+    </div>
   </div>
 </div>
 </body>

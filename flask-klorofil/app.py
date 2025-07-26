@@ -77,23 +77,23 @@ def prediksi():
                 })
 
                 # === VISUALISASI 2D ===
-                def create_2d_plot(x, y, y_label, fname, color):
-                    plt.figure(figsize=(8,6))
-                    plt.scatter(x, y, c=color, edgecolor='k')
-                    plt.xlabel('Excess Green')
-                    plt.ylabel(y_label)
-                    plt.title(f'Excess Green vs {y_label} ({method.upper()})')
-                    plt.grid(True)
-                    plt.tight_layout()
-                    plt.savefig(os.path.join(STATIC_FOLDER, fname), bbox_inches='tight')
-                    plt.close()
+                # def create_2d_plot(x, y, y_label, fname, color):
+                #     plt.figure(figsize=(8,6))
+                #     plt.scatter(x, y, c=color, edgecolor='k')
+                #     plt.xlabel('Excess Green')
+                #     plt.ylabel(y_label)
+                #     plt.title(f'Excess Green vs {y_label} ({method.upper()})')
+                #     plt.grid(True)
+                #     plt.tight_layout()
+                #     plt.savefig(os.path.join(STATIC_FOLDER, fname), bbox_inches='tight')
+                #     plt.close()
 
-                create_2d_plot(df_grouped['Excess_Green'], df_grouped['Prediksi_Klorofil_A'],
-                               'Prediksi Klorofil A', 'plot_a.png', 'red')
-                create_2d_plot(df_grouped['Excess_Green'], df_grouped['Prediksi_Klorofil_B'],
-                               'Prediksi Klorofil B', 'plot_b.png', 'green')
-                create_2d_plot(df_grouped['Excess_Green'], df_grouped['Prediksi_Total_Klorofil'],
-                               'Prediksi Total Klorofil', 'plot_total.png', 'blue')
+                # create_2d_plot(df_grouped['Excess_Green'], df_grouped['Prediksi_Klorofil_A'],
+                #                'Prediksi Klorofil A', 'plot_a.png', 'red')
+                # create_2d_plot(df_grouped['Excess_Green'], df_grouped['Prediksi_Klorofil_B'],
+                #                'Prediksi Klorofil B', 'plot_b.png', 'green')
+                # create_2d_plot(df_grouped['Excess_Green'], df_grouped['Prediksi_Total_Klorofil'],
+                #                'Prediksi Total Klorofil', 'plot_total.png', 'blue')
 
             except Exception as e:
                 pred_results = [{"error": f"Terjadi kesalahan: {str(e)}"}]
@@ -108,6 +108,16 @@ def prediksi():
 @app.route('/history')
 def history():
     return render_template('history.html', history=app.history)
+
+@app.route('/history/<int:id>')
+def history_detail(id):
+    # Mengubah ID dari 1-based menjadi 0-based untuk indexing array
+    array_index = id - 1
+    if 0 <= array_index < len(app.history):
+        history_item = app.history[array_index]
+        return render_template('history_detail.html', history=history_item, id=id)
+    else:
+        return "History item not found", 404
 
 if __name__ == '__main__':
     app.run(debug=True)
