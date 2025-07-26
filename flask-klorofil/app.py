@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request
 import os
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')  
 import matplotlib.pyplot as plt
 import joblib
 from datetime import datetime
@@ -111,7 +109,6 @@ def history():
 
 @app.route('/history/<int:id>')
 def history_detail(id):
-    # Mengubah ID dari 1-based menjadi 0-based untuk indexing array
     array_index = id - 1
     if 0 <= array_index < len(app.history):
         history_item = app.history[array_index]
